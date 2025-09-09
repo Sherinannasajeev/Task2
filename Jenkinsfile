@@ -9,11 +9,12 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                bat 'npm install'
-            }
-        }
+       stage('Install Dependencies') {
+    steps {
+        bat '"C:\\Program Files\\nodejs\\npm.cmd" install'
+    }
+}
+
 
         stage('Test') {
             steps {
