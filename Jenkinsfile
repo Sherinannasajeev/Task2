@@ -16,36 +16,33 @@ pipeline {
         }
 
         stage('Test') {
-    steps {
-        bat '"C:\\Program Files\\nodejs\\npm.cmd" test > test-output.log 2>&1 || exit 0'
-    }
-    post {
-        always {
-            emailext subject: "TEST RESULT: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "Check test details at ${env.BUILD_URL}",
-                     to: "sherinsajeevpaul@gmail.com",
-                     attachLog: true,
-                     attachmentsPattern: 'test-output.log'
+            steps {
+                // Catch errors so the stage failing won't fail the pipeline
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat '"C:\\Program Files\\nodejs\\npm.cmd" test > test-output.log 2>&1'
+                }
+            }
+            post {
+                always {
+                    emailext subject: "TEST RESULT: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                             body: "Check test details at ${env.BUILD_URL}",
+                             to: "sherinsajeevpaul@gmail.com",
+                             attachLog: true,
+                             attachmentsPattern: 'test-output.log'
+                }
+            }
         }
-    }
-}
-
 
         stage('Security Scan') {
             steps {
-                bat '"C:\\Program Files\\nodejs\\npm.cmd" run security-scan > security-output.log 2>&1'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat '"C:\\Program Files\\nodejs\\npm.cmd" run security-scan > security-output.log 2>&1'
+                }
             }
             post {
-                success {
-                    emailext subject: "SECURITY SCAN PASSED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Security scan succeeded.\nCheck build details at ${env.BUILD_URL}",
-                             to: "sherinsajeevpaul@gmail.com",
-                             attachLog: true,
-                             attachmentsPattern: 'security-output.log'
-                }
-                failure {
-                    emailext subject: "SECURITY SCAN FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Security scan failed.\nCheck build details at ${env.BUILD_URL}",
+                always {
+                    emailext subject: "SECURITY SCAN RESULT: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                             body: "Check security scan details at ${env.BUILD_URL}",
                              to: "sherinsajeevpaul@gmail.com",
                              attachLog: true,
                              attachmentsPattern: 'security-output.log'
@@ -55,17 +52,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                bat 'echo Deploying application...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat 'echo Deploying application...'
+                }
             }
             post {
-                success {
-                    emailext subject: "DEPLOYMENT SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Deployment completed successfully.\nCheck build at ${env.BUILD_URL}",
-                             to: "sherinsajeevpaul@gmail.com"
-                }
-                failure {
-                    emailext subject: "DEPLOYMENT FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Deployment failed.\nCheck build at ${env.BUILD_URL}",
+                always {
+                    emailext subject: "DEPLOYMENT RESULT: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                             body: "Check deployment details at ${env.BUILD_URL}",
                              to: "sherinsajeevpaul@gmail.com"
                 }
             }
