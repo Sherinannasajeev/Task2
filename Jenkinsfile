@@ -9,17 +9,15 @@ pipeline {
             }
         }
 
-       stage('Install Dependencies') {
-    steps {
-        bat '"C:\\Program Files\\nodejs\\npm.cmd" install'
-    }
-}
-
+        stage('Install Dependencies') {
+            steps {
+                bat '"C:\\Program Files\\nodejs\\npm.cmd" install'
+            }
+        }
 
         stage('Test') {
             steps {
-
-                bat 'npm test > test-output.log 2>&1'
+                bat '"C:\\Program Files\\nodejs\\npm.cmd" test > test-output.log 2>&1'
             }
             post {
                 success {
@@ -41,7 +39,7 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                bat 'npm run security-scan > security-output.log 2>&1'
+                bat '"C:\\Program Files\\nodejs\\npm.cmd" run security-scan > security-output.log 2>&1'
             }
             post {
                 success {
@@ -64,7 +62,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 bat 'echo Deploying application...'
-
             }
             post {
                 success {
