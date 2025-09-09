@@ -17,7 +17,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                // Redirect output to log file using Windows syntax
+
                 bat 'npm test > test-output.log 2>&1'
             }
             post {
@@ -63,7 +63,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 bat 'echo Deploying application...'
-                // Replace this with your real deployment commands for Windows
+
             }
             post {
                 success {
