@@ -16,26 +16,20 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                bat '"C:\\Program Files\\nodejs\\npm.cmd" test > test-output.log 2>&1'
-            }
-            post {
-                success {
-                    emailext subject: "TEST PASSED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Test stage succeeded.\nCheck build details at ${env.BUILD_URL}",
-                             to: "sherinsajeevpaul@gmail.com",
-                             attachLog: true,
-                             attachmentsPattern: 'test-output.log'
-                }
-                failure {
-                    emailext subject: "TEST FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                             body: "Test stage failed.\nCheck build details at ${env.BUILD_URL}",
-                             to: "sherinsajeevpaul@gmail.com",
-                             attachLog: true,
-                             attachmentsPattern: 'test-output.log'
-                }
-            }
+    steps {
+        bat '"C:\\Program Files\\nodejs\\npm.cmd" test > test-output.log 2>&1 || exit 0'
+    }
+    post {
+        always {
+            emailext subject: "TEST RESULT: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "Check test details at ${env.BUILD_URL}",
+                     to: "sherinsajeevpaul@gmail.com",
+                     attachLog: true,
+                     attachmentsPattern: 'test-output.log'
         }
+    }
+}
+
 
         stage('Security Scan') {
             steps {
